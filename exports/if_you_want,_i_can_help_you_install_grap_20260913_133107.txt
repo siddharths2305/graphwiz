@@ -1,0 +1,12 @@
+digraph Workflow {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fillcolor="#EAF2FF", color="#3A6EA5", fontname="Arial"];
+    edge [color="#3A6EA5", penwidth=1.5];
+    n0 [label="Generated Workflow"];
+    n1 [label="Understand the request"];
+    n2 [label="Build the solution"];
+    n3 [label="Validate the output"];
+    n0 -> n1;
+    n1 -> n2;
+    n2 -> n3;
+}

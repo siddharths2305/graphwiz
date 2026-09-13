@@ -1,0 +1,22 @@
+
+        digraph AIFlow {
+            rankdir=LR;
+            node [shape=box, style="rounded,filled", fillcolor="#EAF2FF", color="#3A6EA5", fontname="Arial"];
+            edge [color="#3A6EA5", penwidth=1.5];
+
+            start [label="Start"];
+            input [label="User asks: how to make a jets engine from scratch explain me as from beginner to..."];
+            agent [label="AI Agent"];
+            analysis [label="Generate response"];
+            output [label="Result: Below is a **complete, step‑by‑step guide** that takes you from the v..."];
+            md [label="Export Markdown"];
+            flow [label="Generate Graphviz Diagram"];
+            end [label="Finish"];
+
+            start -> input -> agent -> analysis -> output;
+            output -> md;
+            output -> flow;
+            md -> end;
+            flow -> end;
+        }
+        

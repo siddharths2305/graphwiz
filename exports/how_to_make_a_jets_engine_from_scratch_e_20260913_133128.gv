@@ -1,0 +1,28 @@
+digraph Workflow {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fillcolor="#EAF2FF", color="#3A6EA5", fontname="Arial"];
+    edge [color="#3A6EA5", penwidth=1.5];
+    n0 [label="AI Response"];
+    n1 [label="Summary"];
+    n2 [label="Suggested next steps"];
+    n3 [label="Clarify the goal or audience."];
+    n4 [label="Break the task into smaller phases."];
+    n5 [label="Turn the answer into an implementation plan if needed."];
+    n6 [label="Example output"];
+    n7 [label="Define the problem clearly."];
+    n8 [label="Gather required inputs and constraints."];
+    n9 [label="Create a solution flow."];
+    n10 [label="Validate the result with test cases."];
+    n11 [label="Final answer"];
+    n0 -> n1;
+    n1 -> n2;
+    n2 -> n3;
+    n3 -> n4;
+    n4 -> n5;
+    n5 -> n6;
+    n6 -> n7;
+    n7 -> n8;
+    n8 -> n9;
+    n9 -> n10;
+    n10 -> n11;
+}
