@@ -25,7 +25,6 @@ It is designed for quick workflow generation and documentation, with a Groq API 
 - `graphwiz.py` — standalone Markdown-to-DOT/SVG conversion script
 - `tests/test_app.py` — regression tests
 - `exports/` — generated artifacts
-- `api_keys.gitignore` — local API key storage
 - `.env.example` — environment variable template
 - `requirements.txt` — Python dependencies
 
@@ -64,14 +63,31 @@ It is designed for quick workflow generation and documentation, with a Groq API 
 5. Add your Groq key:
 
    - Copy `.env.example` to `.env` and fill in the key, or
-   - Put the key in `api_keys.gitignore` in the expected format.
+   - For Streamlit Cloud, add it under **App settings > Secrets**.
 
    Example:
 
    ```text
    GROQ_API_KEY=your_key_here
-   GROQ_MODEL=groq/compound
+   GROQ_MODEL=openai/gpt-oss-120b
    ```
+
+## Deploy on Streamlit Community Cloud
+
+1. Push this repository to GitHub. Do not commit `.env`, `.streamlit/secrets.toml`,
+   `api_keys.gitignore`, or any API key.
+2. In Streamlit Community Cloud, create an app from the repository.
+3. Set the main file to `main.py`.
+4. Open the app settings **Secrets** section and add:
+
+   ```toml
+   GROQ_API_KEY = "your_new_groq_key_here"
+   GROQ_MODEL = "openai/gpt-oss-120b"
+   ```
+
+The app reads these values from Streamlit Secrets in the cloud, or from `.env`
+and environment variables during local development. Generated files are created
+in `exports/` at runtime and are intentionally excluded from Git.
 
 ## Run the app
 

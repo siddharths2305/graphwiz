@@ -9,12 +9,55 @@ from graphviz import Source
 
 OUTPUT_DIR = Path("exports")
 OUTPUT_DIR.mkdir(exist_ok=True)
+DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b"
+GROQ_MODEL_CANDIDATES = (
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "qwen/qwen3-32b",
+)
+
+
+def read_dotenv_key(name: str) -> str:
+    env_file = Path(__file__).with_name(".env")
+    if not env_file.exists():
+        return ""
+
+    try:
+        for raw_line in env_file.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            if key.strip() == name:
+                return value.strip().strip('"\'')
+    except OSError:
+        return ""
+    return ""
+
+
+def read_streamlit_secret(name: str) -> str:
+    try:
+        value = st.secrets.get(name, "")
+    except Exception:
+        return ""
+    return str(value).strip().strip('"\'') if value else ""
 
 
 def read_groq_api_key() -> str:
+    secret_key = read_streamlit_secret("GROQ_API_KEY") or read_streamlit_secret("groq_api")
+    if secret_key:
+        return secret_key
+
     env_key = os.getenv("GROQ_API_KEY") or os.getenv("groq_api")
     if env_key:
         return env_key.strip().strip('"\'')
+
+    dotenv_key = read_dotenv_key("GROQ_API_KEY") or read_dotenv_key("groq_api")
+    if dotenv_key:
+        os.environ["GROQ_API_KEY"] = dotenv_key
+        return dotenv_key
 
     key_file = Path(__file__).with_name("api_keys.gitignore")
     if key_file.exists():
@@ -81,6 +124,34 @@ The requested workflow can be planned, implemented, and documented with a clear 
     return answer
 
 
+def resolve_groq_model(client, requested_model: str) -> str:
+    """Select a chat model exposed by the current Groq account."""
+    try:
+        available_models = client.models.list().data
+        available_ids = {
+            item.get("id", "") if isinstance(item, dict) else getattr(item, "id", "")
+            for item in available_models
+        }
+        available_ids.discard("")
+
+        if requested_model in available_ids:
+            return requested_model
+
+        for candidate in GROQ_MODEL_CANDIDATES:
+            if candidate in available_ids:
+                if requested_model:
+                    st.info(
+                        f"Groq model '{requested_model}' is unavailable for this key. "
+                        f"Using '{candidate}' instead."
+                    )
+                return candidate
+    except Exception:
+        # Let the chat request provide the actionable error if model discovery is unavailable.
+        pass
+
+    return requested_model or DEFAULT_GROQ_MODEL
+
+
 def generate_response(prompt: str) -> str:
     original_prompt = (prompt or "").strip()
     if not original_prompt:
@@ -91,24 +162,49 @@ def generate_response(prompt: str) -> str:
         st.warning("Your prompt was too long for Groq, so it was shortened to fit the API size limit.")
 
     api_key = read_groq_api_key()
-    model = os.getenv("GROQ_MODEL", "groq/compound")
+    model = (
+        read_streamlit_secret("GROQ_MODEL")
+        or os.getenv("GROQ_MODEL")
+        or read_dotenv_key("GROQ_MODEL")
+        or DEFAULT_GROQ_MODEL
+    )
 
     if api_key:
         try:
             from groq import Groq
 
             client = Groq(api_key=api_key)
+            model = resolve_groq_model(client, model)
             completion = client.chat.completions.create(
                 model=model,
-                messages=[{"role": "user", "content": safe_prompt}],
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "Answer the user's request clearly and accurately. "
+                            "Return Markdown beginning with '# Response', followed by "
+                            "a '**Prompt:**' line, then a structured answer with headings, "
+                            "lists, tables, and code blocks where useful. Do not mention "
+                            "these formatting instructions."
+                        ),
+                    },
+                    {"role": "user", "content": safe_prompt},
+                ],
                 temperature=0.7,
-                max_tokens=1200,
+                max_tokens=4096,
             )
-            content = completion.choices[0].message.content
+            content = completion.choices[0].message.content or ""
             if content:
-                return content.strip()
+                answer = content.strip()
+                if not answer.startswith("# Response"):
+                    answer = f"# Response\n\n**Prompt:** {original_prompt}\n\n{answer}"
+                return answer
         except Exception as exc:
-            st.warning(f"Groq request failed: {exc}. Falling back to the local response generator.")
+            st.warning(
+                f"Groq request failed for model '{model}': {exc}. "
+                "Check GROQ_API_KEY and GROQ_MODEL, then retry. "
+                "Falling back to the local response generator."
+            )
 
     return generate_local_response(original_prompt)
 

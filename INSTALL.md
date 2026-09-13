@@ -26,7 +26,7 @@ Create a `.env` file if you want to use environment variables:
 
 ```text
 GROQ_API_KEY=your_api_key_here
-GROQ_MODEL=groq/compound
+GROQ_MODEL=openai/gpt-oss-120b
 ```
 
 Alternatively, you can place a key in `api_keys.gitignore` using this format:
@@ -34,6 +34,11 @@ Alternatively, you can place a key in `api_keys.gitignore` using this format:
 ```text
 groq_api="your_api_key_here"
 ```
+
+The app reads `GROQ_API_KEY` and `GROQ_MODEL` from the process environment, `.env`,
+or `api_keys.gitignore` (for the API key). If `GROQ_MODEL` is omitted, it uses
+`openai/gpt-oss-120b`, or automatically selects an available model if that model
+is not enabled for the key.
 
 ## Launch the app
 
