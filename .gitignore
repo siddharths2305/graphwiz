@@ -7,3 +7,4 @@ api_keys.gitignore
 .pytest_cache/
 exports/*
 !exports/.gitkeep
+GROQ_API_KEY="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"
