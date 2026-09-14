@@ -149,12 +149,13 @@ Or use the Python API directly:
 
 ## 📜 License
 
-This project is for local educational and workflow-generation use.
+This project is for local educational and workflow-generation use Hain pta hai script file use kar ke graphwiz code bhi generate kar sakte hai aur firr diagram acha output generate hoga.
 
 ---
 
 <div align="center">
 
-Made with ❤️ using Streamlit, Groq, and Graphviz
+Made with ❤️ by SID using Streamlit, Groq, and Graphviz and hain yeh link bhi check karna...
+https://graphwiz-ygjh6pttk9sfe6pfcpzex9.streamlit.app/
 
 </div>
