@@ -12,7 +12,7 @@ A Streamlit-powered app that turns AI-generated responses into clean, exportable
 [![Groq](https://img.shields.io/badge/Groq-API-F55036)](https://groq.com/)
 [![License](https://img.shields.io/badge/License-Educational%20Use-lightgrey)](#license)
 
-![AI Agent Studio demo](./assets/demo.gif)
+![AI Agent Studio demo](./tests/demo.gif)
 
 </div>
 
@@ -30,7 +30,7 @@ Perfect for quickly turning ideas, processes, or AI outputs into shareable diagr
 
 | Ask a Question | Generated Workflow | Export Options |
 |:---:|:---:|:---:|
-| ![Prompt screen](./assets/screenshot-prompt.png) | ![Generated diagram](./assets/screenshot-diagram.png) | ![Export options](./assets/screenshot-export.png) |
+| ![Prompt screen](./tests/screenshot-prompt.png) | ![Generated diagram](./tests/screenshot-diagram.png) | ![Export options](./tests/screenshot-export.png) |
 
 </div>
 
@@ -128,12 +128,6 @@ http://127.0.0.1:8502
 ```
 
 ## 🔀 Generate a Workflow from Markdown
-
-<div align="center">
-
-![Markdown to diagram conversion](./assets/markdown-to-diagram.gif)
-
-</div>
 
 Run the converter script directly:
 
